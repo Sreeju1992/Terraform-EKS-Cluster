@@ -8,6 +8,8 @@ module "vpc" {
   private_subnets     =  [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k)]
   public_subnets      =  [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 4)]
 
+  map_public_ip_on_launch = true
+
 # Database subnets
   create_database_subnet_group  = true
   create_database_subnet_route_table = true
