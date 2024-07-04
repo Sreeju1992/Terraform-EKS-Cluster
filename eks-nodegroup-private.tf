@@ -3,7 +3,7 @@ resource "aws_eks_node_group" "eks_ng_private" {
   node_group_name = "${local.name}-eks-ng-private"
   node_role_arn   = aws_iam_role.eks_nodegroup_role.arn
   subnet_ids      = module.vpc.private_subnets
-  version = var.cluster_version
+  version = var.cluster_version #(Optional) Default to EKS cluster Kubernetes version
 
   ami_type = "AL2_x86_64"
   capacity_type = "ON_DEMAND"
@@ -12,12 +12,13 @@ resource "aws_eks_node_group" "eks_ng_private" {
 
   remote_access {
     ec2_ssh_key = aws_key_pair.aws-login.key_name
+    source_security_group_ids = 
   }
 
   scaling_config {
-    desired_size = 1
-    max_size     = 2
-    min_size     = 1
+    desired_size = 2
+    max_size     = 3
+    min_size     = 2
   }
 
   update_config {
