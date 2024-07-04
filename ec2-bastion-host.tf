@@ -44,8 +44,31 @@ resource "aws_eip" "bastion_eip" {
   depends_on = [aws_instance.ec2-bastion-instance, module.vpc]
 }
 
-provisioner "local-exec" {
-    command = "echo VPC created on `date` and VPC ID: ${module.vpc.vpc_id >> vpc-creation-details.txt"
-    working_dir = "/home/vagrant/terraform-scripts/development"
-    on_failure = "continue"
+resource "null_resource" "copy_ec2_keys"{
+    depends_on = [aws_instance.ec2-bastion-instance]
+    # Connection block for provisioners to connect to EC2 instance
+    connection {
+        type = "ssh"
+        host = aws_eip.bastion_eip.public_ip
+        user = "ubuntu"
+        password = ""
+        private_key = file("/home/vagrant/.ssh/id_rsa")   
+    }
+## File provisioner: copies the private key to bastion host
+    provisioner "file" {
+        source = "/home/vagrant/.ssh/id_rsa"
+        destination = "/tmp/id_rsa"
+    }
+## Remote Exec Provisioner: Using remote-exec provisioner to fix the private key
+    provisioner "remote-exec" {
+       inline = [
+        "sudo chmod 400 /tmp/id_rsa"
+       ]  
+   }
+## Local Exec Provisioner: Using Local VPC to get the VPC ID and store it in a file
+    provisioner "local-exec" {
+       command = "echo VPC created on `date` and VPC ID: ${module.vpc.vpc_id} >> vpc-creation-details.txt"
+       working_dir = "/home/vagrant/terraform-scripts/development"
+       on_failure = "continue" 
+    }
 }
