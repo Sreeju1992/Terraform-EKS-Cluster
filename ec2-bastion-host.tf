@@ -69,6 +69,6 @@ resource "null_resource" "copy_ec2_keys"{
     provisioner "local-exec" {
        command = "echo VPC created on `date` and VPC ID: ${module.vpc.vpc_id} >> vpc-creation-details.txt"
        working_dir = "/home/vagrant/terraform-scripts/development"
-       on_failure = "continue" 
+       on_failure = continue 
     }
 }
