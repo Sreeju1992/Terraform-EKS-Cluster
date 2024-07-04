@@ -34,6 +34,6 @@ resource "aws_eks_node_group" "eks_ng_public" {
   ]
 
   tags = {
-    Name = Public_Node_group
+    Name = "Public_Node_group"
   }
 }
